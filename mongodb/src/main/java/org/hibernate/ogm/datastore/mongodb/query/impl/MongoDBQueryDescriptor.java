@@ -6,6 +6,7 @@
  */
 package org.hibernate.ogm.datastore.mongodb.query.impl;
 
+import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.DELETEONE;
 import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.FINDANDMODIFY;
 import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.INSERT;
 import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.REMOVE;
@@ -37,6 +38,7 @@ public class MongoDBQueryDescriptor implements Serializable {
 		INSERTONE,
 		INSERTMANY,
 		REMOVE,
+		DELETEONE,
 		UPDATE,
 		UPDATEONE,
 		UPDATEMANY,
@@ -211,7 +213,7 @@ public class MongoDBQueryDescriptor implements Serializable {
 		return String.format( "MongoDBQueryDescriptor [collectionName=%s, %s=%s, %s=%s, %s%s]",
 			collectionName,
 			operation == FINDANDMODIFY ? "document" : operation == INSERT ? "document(s)" : "where", criteria,
-			operation == UPDATE ? "update" : operation == INSERT ? "insert" : operation == REMOVE ? "remove" : "projection", projection,
-			operation == UPDATE || operation == INSERT || operation == REMOVE ? "" : "options=", options );
+			operation == UPDATE ? "update" : operation == INSERT ? "insert" : operation == REMOVE ? "remove" : operation == DELETEONE ? "deleteOne" : "projection", projection,
+			operation == UPDATE || operation == INSERT || operation == REMOVE  || operation == DELETEONE ? "" : "options=", options );
 	}
 }
