@@ -11,6 +11,7 @@ import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescrip
 import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.INSERT;
 import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.REMOVE;
 import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.UPDATE;
+import static org.hibernate.ogm.datastore.mongodb.query.impl.MongoDBQueryDescriptor.Operation.UPDATEONE;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -213,7 +214,8 @@ public class MongoDBQueryDescriptor implements Serializable {
 		return String.format( "MongoDBQueryDescriptor [collectionName=%s, %s=%s, %s=%s, %s%s]",
 			collectionName,
 			operation == FINDANDMODIFY ? "document" : operation == INSERT ? "document(s)" : "where", criteria,
-			operation == UPDATE ? "update" : operation == INSERT ? "insert" : operation == REMOVE ? "remove" : operation == DELETEONE ? "deleteOne" : "projection", projection,
-			operation == UPDATE || operation == INSERT || operation == REMOVE  || operation == DELETEONE ? "" : "options=", options );
+			operation == UPDATE ? "update" : operation == INSERT ? "insert" : operation == REMOVE ? "remove" : operation == DELETEONE ? "deleteOne" : operation == UPDATEONE ? "updateOne" : "projection", projection,
+			operation == UPDATE || operation == INSERT || operation == REMOVE ? "" : "options=", options );
+
 	}
 }

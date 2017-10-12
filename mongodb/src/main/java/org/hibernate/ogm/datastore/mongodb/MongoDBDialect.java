@@ -838,6 +838,7 @@ public class MongoDBDialect extends BaseGridDialect implements QueryableGridDial
 			case REMOVE:
 			case DELETEONE:
 			case UPDATE:
+			case UPDATEONE:
 				throw log.updateQueryMustBeExecutedViaExecuteUpdate( queryDescriptor );
 			default:
 				throw new IllegalArgumentException( "Unexpected query operation: " + queryDescriptor );
@@ -870,6 +871,8 @@ public class MongoDBDialect extends BaseGridDialect implements QueryableGridDial
 				return doDeleteOne( queryDescriptor, collection );
 			case UPDATE:
 				return doUpdate( queryDescriptor, collection );
+			case UPDATEONE:
+				return doUpdateOne( queryDescriptor, collection );
 			case FIND:
 			case FINDONE:
 			case FINDANDMODIFY:
@@ -1276,6 +1279,37 @@ public class MongoDBDialect extends BaseGridDialect implements QueryableGridDial
 			return (int) result.getModifiedCount();
 		}
 		return -1; // Not sure if we should throw an exception instead?
+	}
+
+	private int doUpdateOne(final MongoDBQueryDescriptor queryDescriptor, final MongoCollection<Document> collection) {
+		Document query = queryDescriptor.getCriteria();
+		Document update = queryDescriptor.getUpdateOrInsertOne();
+		Document options = queryDescriptor.getOptions();
+		Collation collation = null;
+		Boolean upsert = FALSE;
+		WriteConcern writeConcern = null;
+		if ( options != null ) {
+			Document wc = (Document) options.get( "writeConcern" );
+			writeConcern = getWriteConcern( wc );
+
+			upsert = (Boolean) options.get( "upsert" );
+			upsert = ( upsert != null ) ? upsert : FALSE;
+
+			Document col = (Document) options.get( "collation" );
+			collation = ( col != null ) ? getCollation( col ) : null;
+		}
+		UpdateOptions updateOptions = new UpdateOptions()
+				.upsert( upsert )
+				.collation( collation );
+
+		UpdateResult updateResult = collection
+				.withWriteConcern( writeConcern != null ? writeConcern : collection.getWriteConcern() )
+				.updateOne( query, update, updateOptions );
+
+		if ( updateResult.wasAcknowledged() ) {
+			return (int) updateResult.getModifiedCount();
+		}
+		return -1;
 	}
 
 	private static ClosableIterator<Tuple> doCount(MongoDBQueryDescriptor query, MongoCollection<Document> collection) {
